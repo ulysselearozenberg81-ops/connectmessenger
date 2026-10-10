@@ -89,14 +89,15 @@
 
     <!-- Script Logique Connect -->
     <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAjZrcr430nF9eklDSpQEKSKZDvRYYNI_Y",
-  authDomain: "connectmessenger-41ac8.firebaseapp.com",
-  projectId: "connectmessenger-41ac8",
-  storageBucket: "connectmessenger-41ac8.firebasestorage.app",
-  messagingSenderId: "691375453229",
-  appId: "1:691375453229:web:9ada6b088fb2185eee34a4"
-};
+        // N'oubliez pas de vérifier vos identifiants Firebase ci-dessous
+        const firebaseConfig = {
+            apiKey: "VOTRE_API_KEY",
+            authDomain: "VOTRE_AUTH_DOMAIN",
+            projectId: "VOTRE_PROJECT_ID",
+            storageBucket: "VOTRE_STORAGE_BUCKET",
+            messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
+            appId: "VOTRE_APP_ID"
+        };
 
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -115,7 +116,7 @@ const firebaseConfig = {
         const usersListContainer = document.getElementById('users-list');
 
         let currentUser = null;
-        let currentChatId = 'group-global'; // ID de la discussion active (soit 'group-global', soit un ID combiné pour les DM)
+        let currentChatId = 'group-global'; 
         let chatTitleName = 'Le Groupe des Potes';
         let unsubscribeMessages = null;
         let allUsersCache = [];
@@ -127,7 +128,6 @@ const firebaseConfig = {
                 myProfileName.textContent = emailPrefix;
                 myAvatar.textContent = emailPrefix.charAt(0).toUpperCase();
 
-                // Enregistrer l'utilisateur dans Firestore pour qu'il apparaisse dans la liste de recherche
                 await db.collection('users').doc(user.uid).set({
                     uid: user.uid,
                     email: user.email,
@@ -171,7 +171,6 @@ const firebaseConfig = {
             loadUsers();
         }
 
-        // Charger la liste des autres utilisateurs inscrits
         async function loadUsers() {
             const snapshot = await db.collection('users').get();
             allUsersCache = [];
@@ -207,7 +206,6 @@ const firebaseConfig = {
             });
         }
 
-        // Filtrer les utilisateurs lors de la recherche
         function filterUsers() {
             const query = document.getElementById('search-user-input').value.toLowerCase();
             const filtered = allUsersCache.filter(u => u.email.toLowerCase().includes(query) || u.username.toLowerCase().includes(query));
@@ -223,7 +221,6 @@ const firebaseConfig = {
         }
 
         function openPrivateChat(user) {
-            // Créer un ID de discussion unique trié par UID pour que les deux participants pointent vers la même conversation
             currentChatId = [currentUser.uid, user.uid].sort().join('_');
             chatTitleName = user.username;
             chatTitle.textContent = chatTitleName;
@@ -243,17 +240,21 @@ const firebaseConfig = {
             selectorScreen.classList.remove('hidden');
         }
 
-        // Écouter les messages de la conversation active en temps réel
+        // Écoute des messages modifiée (sans .orderBy pour éviter le blocage d'index)
         function listenToMessages() {
             if (unsubscribeMessages) unsubscribeMessages();
 
             unsubscribeMessages = db.collection('messages')
                 .where('chatId', '==', currentChatId)
-                .orderBy('createdAt', 'asc')
                 .onSnapshot(snapshot => {
                     messagesContainer.innerHTML = '';
-                    snapshot.forEach(doc => {
-                        const msg = doc.data();
+                    
+                    // Récupération et tri manuel côté client par date
+                    const docs = [];
+                    snapshot.forEach(doc => docs.push(doc.data()));
+                    docs.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+
+                    docs.forEach(msg => {
                         const isMe = msg.userId === currentUser.uid;
                         const senderName = msg.userEmail ? msg.userEmail.split('@')[0] : 'Inconnu';
 
