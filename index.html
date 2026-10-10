@@ -13,48 +13,47 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ffffff">
 </head>
-<body class="bg-white text-black h-screen flex flex-col justify-between overflow-hidden font-sans">
+<body class="bg-white text-black h-screen flex flex-col justify-between overflow-hidden font-sans select-none">
 
     <!-- ÉCRAN D'AUTHENTIFICATION -->
     <div id="auth-screen" class="flex flex-col justify-center items-center h-full p-6 bg-white max-w-sm mx-auto w-full">
         <div class="text-center mb-8">
-            <h1 class="text-4xl font-extrabold tracking-tight mb-2 font-serif text-indigo-600">Connect</h1>
-            <p class="text-gray-400 text-sm">Retrouve tes potes en un instant.</p>
+            <h1 class="text-4xl font-extrabold tracking-tight mb-2 font-serif">Connect</h1>
+            <p class="text-gray-400 text-sm">Connecte-toi pour discuter avec tes potes.</p>
         </div>
-        <input type="email" id="email" placeholder="Adresse e-mail" class="w-full p-3 mb-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
-        <input type="password" id="password" placeholder="Mot de passe" class="w-full p-3 mb-4 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
-        <button onclick="handleAuth('login')" class="w-full bg-indigo-600 text-white p-3 rounded-xl font-semibold text-sm mb-3 shadow-sm active:opacity-80">Se connecter</button>
-        <button onclick="handleAuth('signup')" class="w-full text-indigo-600 font-semibold text-sm py-2">Créer un compte</button>
+        <input type="email" id="email" placeholder="Adresse e-mail" class="w-full p-3 mb-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gray-400">
+        <input type="password" id="password" placeholder="Mot de passe" class="w-full p-3 mb-4 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gray-400">
+        <button type="button" onclick="handleAuth('login')" class="w-full bg-[#0095f6] text-white p-3 rounded-xl font-semibold text-sm mb-3 shadow-sm active:opacity-80">Se connecter</button>
+        <button type="button" onclick="handleAuth('signup')" class="w-full text-[#0095f6] font-semibold text-sm py-2">Créer un compte</button>
     </div>
 
     <!-- ÉCRAN DE SÉLECTION / RECHERCHE DE DISCUSSION -->
     <div id="selector-screen" class="hidden flex flex-col h-full bg-white">
-        <header class="border-b border-gray-100 px-4 py-4 flex justify-between items-center bg-white">
+        <header class="border-b border-gray-100 px-4 py-3 flex justify-between items-center bg-white">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" id="my-avatar">C</div>
+                <div class="w-9 h-9 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" id="my-avatar">C</div>
                 <div>
                     <h1 class="font-bold text-sm text-gray-900" id="my-profile-name">Mon Profil</h1>
-                    <span class="text-xs text-gray-400">En ligne</span>
                 </div>
             </div>
-            <button onclick="logout()" class="text-xs font-semibold text-gray-500 hover:text-red-500 bg-gray-100 px-3 py-1.5 rounded-full transition-colors">Déconnexion</button>
+            <button type="button" onclick="logout()" class="text-xs font-semibold text-gray-500 hover:text-red-500 bg-gray-100 px-3 py-1.5 rounded-full transition-colors">Déconnexion</button>
         </header>
 
-        <div class="p-4 border-b border-gray-100">
-            <input type="text" id="search-user-input" placeholder="Rechercher un pote par email..." oninput="filterUsers()" class="w-full p-3 bg-gray-100 border-none rounded-xl text-sm focus:outline-none text-gray-900">
+        <div class="p-3 border-b border-gray-100">
+            <input type="text" id="search-user-input" placeholder="Rechercher..." oninput="filterUsers()" class="w-full p-2.5 bg-gray-100 border-none rounded-xl text-sm focus:outline-none text-gray-900">
         </div>
 
-        <div class="flex-1 overflow-y-auto p-4 space-y-2">
+        <div class="flex-1 overflow-y-auto p-3 space-y-2">
             <!-- Option Chat de Groupe Global -->
-            <div onclick="openGroupChat()" class="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 cursor-pointer transition-colors border border-indigo-50 bg-indigo-50/30">
-                <div class="w-12 h-12 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">🌍</div>
+            <div onclick="openGroupChat()" class="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 cursor-pointer transition-colors border border-gray-100">
+                <div class="w-11 h-11 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">🌍</div>
                 <div>
                     <h2 class="font-bold text-sm text-gray-900">Le Groupe des Potes</h2>
-                    <p class="text-xs text-gray-500">Discussion générale accessible à tous</p>
+                    <p class="text-xs text-gray-400">Discussion générale</p>
                 </div>
             </div>
 
-            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-4 mb-2">Discussions privées</div>
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-4 mb-1 px-1">Messages</div>
             <!-- Liste des utilisateurs inscrits -->
             <div id="users-list" class="space-y-1">
                 <!-- Les utilisateurs s'afficheront ici -->
@@ -62,15 +61,14 @@
         </div>
     </div>
 
-    <!-- ÉCRAN DE DISCUSSION (Actif) -->
+    <!-- ÉCRAN DE DISCUSSION -->
     <div id="chat-screen" class="hidden flex flex-col h-full bg-white">
         <header class="border-b border-gray-100 px-4 py-3 flex justify-between items-center bg-white sticky top-0 z-10">
             <div class="flex items-center gap-3">
-                <button onclick="backToSelector()" class="text-gray-600 font-bold text-lg mr-1">←</button>
-                <div class="w-9 h-9 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" id="chat-avatar">#</div>
+                <button type="button" onclick="backToSelector()" class="text-gray-900 font-bold text-xl mr-1 px-1">←</button>
+                <div class="w-9 h-9 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" id="chat-avatar">#</div>
                 <div>
                     <h1 class="font-bold text-sm text-gray-900" id="chat-title">Discussion</h1>
-                    <span class="text-xs text-green-500 flex items-center gap-1">● Actif</span>
                 </div>
             </div>
         </header>
@@ -80,17 +78,16 @@
 
         <!-- Barre de saisie -->
         <footer class="p-3 bg-white border-t border-gray-100">
-            <form id="chat-form" onsubmit="sendMessage(event)" class="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 border border-gray-200 focus-within:border-indigo-400">
-                <input type="text" id="message-input" placeholder="Écris un message..." autocomplete="off" class="flex-1 bg-transparent text-sm focus:outline-none text-gray-900">
-                <button type="submit" class="text-indigo-600 font-semibold text-sm hover:opacity-80 transition-opacity">Envoyer</button>
-            </form>
+            <div class="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 border border-gray-200 focus-within:border-gray-400">
+                <input type="text" id="message-input" placeholder="Message..." autocomplete="off" class="flex-1 bg-transparent text-sm focus:outline-none text-gray-900">
+                <button type="button" id="send-btn" onclick="sendMessage()" class="text-[#0095f6] font-semibold text-sm hover:opacity-80 transition-opacity px-1">Envoyer</button>
+            </div>
         </footer>
     </div>
 
     <!-- Script Logique Connect -->
     <script>
-        // N'oubliez pas de vérifier vos identifiants Firebase ci-dessous
-       const firebaseConfig = {
+        const firebaseConfig = {
   apiKey: "AIzaSyAjZrcr430nF9eklDSpQEKSKZDvRYYNI_Y",
   authDomain: "connectmessenger-41ac8.firebaseapp.com",
   projectId: "connectmessenger-41ac8",
@@ -120,6 +117,14 @@
         let chatTitleName = 'Le Groupe des Potes';
         let unsubscribeMessages = null;
         let allUsersCache = [];
+
+        // Permettre l'envoi avec la touche Entrée sur mobile
+        messageInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
 
         auth.onAuthStateChanged(async user => {
             if (user) {
@@ -196,7 +201,7 @@
                 
                 const initial = user.username.charAt(0).toUpperCase();
                 div.innerHTML = `
-                    <div class="w-10 h-10 bg-gray-200 text-gray-700 rounded-full flex items-center justify-center font-bold text-sm">${initial}</div>
+                    <div class="w-10 h-10 bg-gray-200 text-gray-800 rounded-full flex items-center justify-center font-bold text-sm">${initial}</div>
                     <div>
                         <h3 class="font-bold text-sm text-gray-900">${user.username}</h3>
                         <p class="text-xs text-gray-400">${user.email}</p>
@@ -240,7 +245,6 @@
             selectorScreen.classList.remove('hidden');
         }
 
-        // Écoute des messages modifiée (sans .orderBy pour éviter le blocage d'index)
         function listenToMessages() {
             if (unsubscribeMessages) unsubscribeMessages();
 
@@ -249,7 +253,6 @@
                 .onSnapshot(snapshot => {
                     messagesContainer.innerHTML = '';
                     
-                    // Récupération et tri manuel côté client par date
                     const docs = [];
                     snapshot.forEach(doc => docs.push(doc.data()));
                     docs.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
@@ -269,10 +272,10 @@
                         }
 
                         const bubble = document.createElement('div');
-                        bubble.className = `max-w-[70%] px-4 py-2.5 rounded-2xl text-sm break-words ${
+                        bubble.className = `max-w-[75%] px-4 py-2.5 rounded-2xl text-sm break-words ${
                             isMe 
-                                ? 'bg-indigo-600 text-white rounded-br-xs' 
-                                : 'bg-gray-100 text-gray-900 rounded-bl-xs'
+                                ? 'bg-[#3797EF] text-white rounded-br-xs' 
+                                : 'bg-[#EFEFEF] text-black rounded-bl-xs'
                         }`;
                         bubble.textContent = msg.content;
                         
@@ -283,10 +286,11 @@
                 });
         }
 
-        async function sendMessage(e) {
-            e.preventDefault();
+        async function sendMessage() {
             const text = messageInput.value.trim();
             if (!text) return;
+
+            messageInput.value = '';
 
             try {
                 await db.collection('messages').add({
@@ -296,7 +300,6 @@
                     userEmail: currentUser.email,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                messageInput.value = '';
             } catch (error) {
                 alert(error.message);
             }
