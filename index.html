@@ -235,10 +235,8 @@
         if (userDoc.exists) {
           currentUser = userDoc.data();
         } else {
-          // Création automatique du profil si connexion Google pour la première fois
           let username = user.displayName ? user.displayName.toLowerCase().replace(/\s+/g, '_') : `user_${Math.floor(Math.random() * 10000)}`;
           
-          // Vérifier l'unicité du pseudo
           const check = await db.collection('users').where('username', '==', username).get();
           if (!check.empty) {
             username = `${username}_${Math.floor(Math.random() * 1000)}`;
@@ -308,11 +306,17 @@
     async function handleGoogleAuth() {
       const provider = new firebase.auth.GoogleAuthProvider();
       try {
-        await auth.signInWithPopup(provider);
+        // Utilisation de signInWithRedirect pour contourner les bloqueurs de popups et les erreurs de domaine non autorisé en local / preview
+        await auth.signInWithRedirect(provider);
       } catch (err) {
         showError("Erreur lors de la connexion avec Google : " + err.message);
       }
     }
+
+    // Gestion du retour de redirection Google
+    auth.getRedirectResult().catch((err) => {
+      showError("Erreur Google Redirect : " + err.message);
+    });
 
     function showError(msg) {
       const errorEl = document.getElementById('auth-error');
