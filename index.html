@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Direct - PoteChat</title>
+    <title>Connect</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- SDK Firebase -->
@@ -15,84 +15,131 @@
 </head>
 <body class="bg-white text-black h-screen flex flex-col justify-between overflow-hidden font-sans">
 
-    <!-- ÉCRAN D'AUTHENTIFICATION (Style Insta Clean) -->
+    <!-- ÉCRAN D'AUTHENTIFICATION -->
     <div id="auth-screen" class="flex flex-col justify-center items-center h-full p-6 bg-white max-w-sm mx-auto w-full">
         <div class="text-center mb-8">
-            <h1 class="text-4xl font-extrabold tracking-tight mb-2 font-serif">Instagram</h1>
-            <p class="text-gray-400 text-sm">Connecte-toi pour discuter avec tes potes.</p>
+            <h1 class="text-4xl font-extrabold tracking-tight mb-2 font-serif text-indigo-600">Connect</h1>
+            <p class="text-gray-400 text-sm">Retrouve tes potes en un instant.</p>
         </div>
-        <input type="email" id="email" placeholder="Téléphone, nom d'utilisateur ou e-mail" class="w-full p-3 mb-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400">
-        <input type="password" id="password" placeholder="Mot de passe" class="w-full p-3 mb-4 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400">
-        <button onclick="handleAuth('login')" class="w-full bg-[#0095f6] text-white p-3 rounded-lg font-semibold text-sm mb-3 active:opacity-80">Se connecter</button>
-        <button onclick="handleAuth('signup')" class="w-full text-[#0095f6] font-semibold text-sm py-2">Créer un compte</button>
+        <input type="email" id="email" placeholder="Adresse e-mail" class="w-full p-3 mb-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+        <input type="password" id="password" placeholder="Mot de passe" class="w-full p-3 mb-4 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+        <button onclick="handleAuth('login')" class="w-full bg-indigo-600 text-white p-3 rounded-xl font-semibold text-sm mb-3 shadow-sm active:opacity-80">Se connecter</button>
+        <button onclick="handleAuth('signup')" class="w-full text-indigo-600 font-semibold text-sm py-2">Créer un compte</button>
     </div>
 
-    <!-- ÉCRAN DE DISCUSSION (Style Direct Instagram) -->
-    <div id="chat-screen" class="hidden flex flex-col h-full bg-white">
-        <!-- En-tête type Direct -->
-        <header class="border-b border-gray-100 px-4 py-3 flex justify-between items-center bg-white sticky top-0 z-10">
+    <!-- ÉCRAN DE SÉLECTION / RECHERCHE DE DISCUSSION -->
+    <div id="selector-screen" class="hidden flex flex-col h-full bg-white">
+        <header class="border-b border-gray-100 px-4 py-4 flex justify-between items-center bg-white">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" id="user-avatar">
-                    #
-                </div>
+                <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" id="my-avatar">C</div>
                 <div>
-                    <h1 class="font-bold text-sm text-gray-900" id="current-username">Discussion de groupe</h1>
-                    <span class="text-xs text-green-500 flex items-center gap-1">● En ligne</span>
+                    <h1 class="font-bold text-sm text-gray-900" id="my-profile-name">Mon Profil</h1>
+                    <span class="text-xs text-gray-400">En ligne</span>
                 </div>
             </div>
-            <button onclick="logout()" class="text-xs font-semibold text-gray-500 hover:text-red-500 bg-gray-100 px-3 py-1.5 rounded-full transition-colors">Quitter</button>
+            <button onclick="logout()" class="text-xs font-semibold text-gray-500 hover:text-red-500 bg-gray-100 px-3 py-1.5 rounded-full transition-colors">Déconnexion</button>
+        </header>
+
+        <div class="p-4 border-b border-gray-100">
+            <input type="text" id="search-user-input" placeholder="Rechercher un pote par email..." oninput="filterUsers()" class="w-full p-3 bg-gray-100 border-none rounded-xl text-sm focus:outline-none text-gray-900">
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 space-y-2">
+            <!-- Option Chat de Groupe Global -->
+            <div onclick="openGroupChat()" class="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 cursor-pointer transition-colors border border-indigo-50 bg-indigo-50/30">
+                <div class="w-12 h-12 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">🌍</div>
+                <div>
+                    <h2 class="font-bold text-sm text-gray-900">Le Groupe des Potes</h2>
+                    <p class="text-xs text-gray-500">Discussion générale accessible à tous</p>
+                </div>
+            </div>
+
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-4 mb-2">Discussions privées</div>
+            <!-- Liste des utilisateurs inscrits -->
+            <div id="users-list" class="space-y-1">
+                <!-- Les utilisateurs s'afficheront ici -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ÉCRAN DE DISCUSSION (Actif) -->
+    <div id="chat-screen" class="hidden flex flex-col h-full bg-white">
+        <header class="border-b border-gray-100 px-4 py-3 flex justify-between items-center bg-white sticky top-0 z-10">
+            <div class="flex items-center gap-3">
+                <button onclick="backToSelector()" class="text-gray-600 font-bold text-lg mr-1">←</button>
+                <div class="w-9 h-9 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" id="chat-avatar">#</div>
+                <div>
+                    <h1 class="font-bold text-sm text-gray-900" id="chat-title">Discussion</h1>
+                    <span class="text-xs text-green-500 flex items-center gap-1">● Actif</span>
+                </div>
+            </div>
         </header>
 
         <!-- Liste des messages -->
-        <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-2 flex flex-col bg-white">
-            <!-- Les messages s'injectent ici -->
-        </div>
+        <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-2 flex flex-col bg-white"></div>
 
-        <!-- Barre de saisie style Instagram Direct -->
+        <!-- Barre de saisie -->
         <footer class="p-3 bg-white border-t border-gray-100">
-            <form id="chat-form" onsubmit="sendMessage(event)" class="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 border border-gray-200 focus-within:border-gray-400">
-                <input type="text" id="message-input" placeholder="Message..." autocomplete="off" class="flex-1 bg-transparent text-sm focus:outline-none text-gray-900">
-                <button type="submit" class="text-[#0095f6] font-semibold text-sm hover:opacity-80 transition-opacity">Envoyer</button>
+            <form id="chat-form" onsubmit="sendMessage(event)" class="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 border border-gray-200 focus-within:border-indigo-400">
+                <input type="text" id="message-input" placeholder="Écris un message..." autocomplete="off" class="flex-1 bg-transparent text-sm focus:outline-none text-gray-900">
+                <button type="submit" class="text-indigo-600 font-semibold text-sm hover:opacity-80 transition-opacity">Envoyer</button>
             </form>
         </footer>
     </div>
 
-    <!-- Script Logique -->
+    <!-- Script Logique Connect -->
     <script>
-        // Remplacez par vos identifiants Firebase
         const firebaseConfig = {
-  apiKey: "AIzaSyAjZrcr430nF9eklDSpQEKSKZDvRYYNI_Y",
-  authDomain: "connectmessenger-41ac8.firebaseapp.com",
-  projectId: "connectmessenger-41ac8",
-  storageBucket: "connectmessenger-41ac8.firebasestorage.app",
-  messagingSenderId: "691375453229",
-  appId: "1:691375453229:web:9ada6b088fb2185eee34a4"
-};
-
+            apiKey: "VOTRE_API_KEY",
+            authDomain: "VOTRE_AUTH_DOMAIN",
+            projectId: "VOTRE_PROJECT_ID",
+            storageBucket: "VOTRE_STORAGE_BUCKET",
+            messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
+            appId: "VOTRE_APP_ID"
+        };
 
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
         const authScreen = document.getElementById('auth-screen');
+        const selectorScreen = document.getElementById('selector-screen');
         const chatScreen = document.getElementById('chat-screen');
         const messagesContainer = document.getElementById('messages-container');
         const messageInput = document.getElementById('message-input');
-        const currentUsername = document.getElementById('current-username');
-        const userAvatar = document.getElementById('user-avatar');
+        
+        const myProfileName = document.getElementById('my-profile-name');
+        const myAvatar = document.getElementById('my-avatar');
+        const chatTitle = document.getElementById('chat-title');
+        const chatAvatar = document.getElementById('chat-avatar');
+        const usersListContainer = document.getElementById('users-list');
 
         let currentUser = null;
+        let currentChatId = 'group-global'; // ID de la discussion active (soit 'group-global', soit un ID combiné pour les DM)
+        let chatTitleName = 'Le Groupe des Potes';
+        let unsubscribeMessages = null;
+        let allUsersCache = [];
 
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async user => {
             if (user) {
                 currentUser = user;
                 const emailPrefix = user.email.split('@')[0];
-                currentUsername.textContent = emailPrefix;
-                userAvatar.textContent = emailPrefix.charAt(0).toUpperCase();
-                showChat();
+                myProfileName.textContent = emailPrefix;
+                myAvatar.textContent = emailPrefix.charAt(0).toUpperCase();
+
+                // Enregistrer l'utilisateur dans Firestore pour qu'il apparaisse dans la liste de recherche
+                await db.collection('users').doc(user.uid).set({
+                    uid: user.uid,
+                    email: user.email,
+                    username: emailPrefix,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
+                showSelector();
             } else {
                 currentUser = null;
                 chatScreen.classList.add('hidden');
+                selectorScreen.classList.add('hidden');
                 authScreen.classList.remove('hidden');
             }
         });
@@ -116,14 +163,92 @@
             await auth.signOut();
         }
 
-        function showChat() {
+        function showSelector() {
+            if (unsubscribeMessages) unsubscribeMessages();
             authScreen.classList.add('hidden');
+            chatScreen.classList.add('hidden');
+            selectorScreen.classList.remove('hidden');
+            loadUsers();
+        }
+
+        // Charger la liste des autres utilisateurs inscrits
+        async function loadUsers() {
+            const snapshot = await db.collection('users').get();
+            allUsersCache = [];
+            snapshot.forEach(doc => {
+                const userData = doc.data();
+                if (userData.uid !== currentUser.uid) {
+                    allUsersCache.push(userData);
+                }
+            });
+            renderUsers(allUsersCache);
+        }
+
+        function renderUsers(users) {
+            usersListContainer.innerHTML = '';
+            if (users.length === 0) {
+                usersListContainer.innerHTML = '<p class="text-xs text-gray-400 p-2">Aucun autre utilisateur trouvé.</p>';
+                return;
+            }
+            users.forEach(user => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 cursor-pointer transition-colors';
+                div.onclick = () => openPrivateChat(user);
+                
+                const initial = user.username.charAt(0).toUpperCase();
+                div.innerHTML = `
+                    <div class="w-10 h-10 bg-gray-200 text-gray-700 rounded-full flex items-center justify-center font-bold text-sm">${initial}</div>
+                    <div>
+                        <h3 class="font-bold text-sm text-gray-900">${user.username}</h3>
+                        <p class="text-xs text-gray-400">${user.email}</p>
+                    </div>
+                `;
+                usersListContainer.appendChild(div);
+            });
+        }
+
+        // Filtrer les utilisateurs lors de la recherche
+        function filterUsers() {
+            const query = document.getElementById('search-user-input').value.toLowerCase();
+            const filtered = allUsersCache.filter(u => u.email.toLowerCase().includes(query) || u.username.toLowerCase().includes(query));
+            renderUsers(filtered);
+        }
+
+        function openGroupChat() {
+            currentChatId = 'group-global';
+            chatTitleName = 'Le Groupe des Potes';
+            chatTitle.textContent = chatTitleName;
+            chatAvatar.textContent = '🌍';
+            showChatRoom();
+        }
+
+        function openPrivateChat(user) {
+            // Créer un ID de discussion unique trié par UID pour que les deux participants pointent vers la même conversation
+            currentChatId = [currentUser.uid, user.uid].sort().join('_');
+            chatTitleName = user.username;
+            chatTitle.textContent = chatTitleName;
+            chatAvatar.textContent = chatTitleName.charAt(0).toUpperCase();
+            showChatRoom();
+        }
+
+        function showChatRoom() {
+            selectorScreen.classList.add('hidden');
             chatScreen.classList.remove('hidden');
             listenToMessages();
         }
 
+        function backToSelector() {
+            if (unsubscribeMessages) unsubscribeMessages();
+            chatScreen.classList.add('hidden');
+            selectorScreen.classList.remove('hidden');
+        }
+
+        // Écouter les messages de la conversation active en temps réel
         function listenToMessages() {
-            db.collection('messages')
+            if (unsubscribeMessages) unsubscribeMessages();
+
+            unsubscribeMessages = db.collection('messages')
+                .where('chatId', '==', currentChatId)
                 .orderBy('createdAt', 'asc')
                 .onSnapshot(snapshot => {
                     messagesContainer.innerHTML = '';
@@ -135,20 +260,18 @@
                         const wrapper = document.createElement('div');
                         wrapper.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} w-full mb-1`;
 
-                        // Afficher le pseudo de l'expéditeur si ce n'est pas nous
-                        if (!isMe) {
-                            const nameTag = document.span || document.createElement('span');
+                        if (!isMe && currentChatId === 'group-global') {
+                            const nameTag = document.createElement('span');
                             nameTag.className = 'text-[10px] text-gray-400 ml-3 mb-1';
                             nameTag.textContent = senderName;
                             wrapper.appendChild(nameTag);
                         }
 
                         const bubble = document.createElement('div');
-                        // Style bulle Instagram : Bleu (#3797EF) pour soi, Gris clair (#EFEFEF) pour les autres
                         bubble.className = `max-w-[70%] px-4 py-2.5 rounded-2xl text-sm break-words ${
                             isMe 
-                                ? 'bg-[#3797EF] text-white rounded-br-xs' 
-                                : 'bg-[#EFEFEF] text-black rounded-bl-xs'
+                                ? 'bg-indigo-600 text-white rounded-br-xs' 
+                                : 'bg-gray-100 text-gray-900 rounded-bl-xs'
                         }`;
                         bubble.textContent = msg.content;
                         
@@ -166,6 +289,7 @@
 
             try {
                 await db.collection('messages').add({
+                    chatId: currentChatId,
                     content: text,
                     userId: currentUser.uid,
                     userEmail: currentUser.email,
