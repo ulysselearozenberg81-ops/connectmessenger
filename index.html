@@ -3,53 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PoteChat - Firebase</title>
+    <title>Direct - PoteChat</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Liens SDK Firebase (compatibles CDN) -->
+    <!-- SDK Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <!-- Manifest PWA -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#4f46e5">
+    <meta name="theme-color" content="#ffffff">
 </head>
-<body class="bg-gray-100 h-screen flex flex-col justify-between overflow-hidden">
+<body class="bg-white text-black h-screen flex flex-col justify-between overflow-hidden font-sans">
 
-    <!-- ÉCRAN D'AUTHENTIFICATION -->
-    <div id="auth-screen" class="flex flex-col justify-center items-center h-full p-6 bg-white">
-        <h1 class="text-3xl font-bold text-indigo-600 mb-2">PoteChat 🚀</h1>
-        <p class="text-gray-500 mb-6 text-center">Version Firebase, 100% gratuit.</p>
-        <input type="email" id="email" placeholder="Email" class="w-full max-w-sm p-3 mb-3 border rounded-xl focus:outline-indigo-600">
-        <input type="password" id="password" placeholder="Mot de passe" class="w-full max-w-sm p-3 mb-4 border rounded-xl focus:outline-indigo-600">
-        <button onclick="handleAuth('login')" class="w-full max-w-sm bg-indigo-600 text-white p-3 rounded-xl font-semibold mb-2 shadow-md">Se connecter</button>
-        <button onclick="handleAuth('signup')" class="w-full max-w-sm bg-gray-200 text-gray-800 p-3 rounded-xl font-semibold">Créer un compte</button>
+    <!-- ÉCRAN D'AUTHENTIFICATION (Style Insta Clean) -->
+    <div id="auth-screen" class="flex flex-col justify-center items-center h-full p-6 bg-white max-w-sm mx-auto w-full">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold tracking-tight mb-2 font-serif">Instagram</h1>
+            <p class="text-gray-400 text-sm">Connecte-toi pour discuter avec tes potes.</p>
+        </div>
+        <input type="email" id="email" placeholder="Téléphone, nom d'utilisateur ou e-mail" class="w-full p-3 mb-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400">
+        <input type="password" id="password" placeholder="Mot de passe" class="w-full p-3 mb-4 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400">
+        <button onclick="handleAuth('login')" class="w-full bg-[#0095f6] text-white p-3 rounded-lg font-semibold text-sm mb-3 active:opacity-80">Se connecter</button>
+        <button onclick="handleAuth('signup')" class="w-full text-[#0095f6] font-semibold text-sm py-2">Créer un compte</button>
     </div>
 
-    <!-- ÉCRAN DE DISCUSSION -->
-    <div id="chat-screen" class="hidden flex flex-col h-full">
-        <!-- En-tête -->
-        <header class="bg-white border-b p-4 flex justify-between items-center shadow-sm">
-            <h1 class="font-bold text-lg text-gray-800">💬 Le Chat des Potes</h1>
-            <button onclick="logout()" class="text-sm text-red-500 font-medium">Déconnexion</button>
+    <!-- ÉCRAN DE DISCUSSION (Style Direct Instagram) -->
+    <div id="chat-screen" class="hidden flex flex-col h-full bg-white">
+        <!-- En-tête type Direct -->
+        <header class="border-b border-gray-100 px-4 py-3 flex justify-between items-center bg-white sticky top-0 z-10">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" id="user-avatar">
+                    #
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm text-gray-900" id="current-username">Discussion de groupe</h1>
+                    <span class="text-xs text-green-500 flex items-center gap-1">● En ligne</span>
+                </div>
+            </div>
+            <button onclick="logout()" class="text-xs font-semibold text-gray-500 hover:text-red-500 bg-gray-100 px-3 py-1.5 rounded-full transition-colors">Quitter</button>
         </header>
 
         <!-- Liste des messages -->
-        <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 flex flex-col">
-            <!-- Les messages s'ajouteront dynamiquement ici -->
+        <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-2 flex flex-col bg-white">
+            <!-- Les messages s'injectent ici -->
         </div>
 
-        <!-- Formulaire d'envoi -->
-        <form id="chat-form" onsubmit="sendMessage(event)" class="bg-white border-t p-3 flex gap-2">
-            <input type="text" id="message-input" placeholder="Écris un message..." autocomplete="off" class="flex-1 p-3 border rounded-full focus:outline-indigo-600 text-sm">
-            <button type="submit" class="bg-indigo-600 text-white px-5 rounded-full font-semibold text-sm shadow-md">Envoyer</button>
-        </form>
+        <!-- Barre de saisie style Instagram Direct -->
+        <footer class="p-3 bg-white border-t border-gray-100">
+            <form id="chat-form" onsubmit="sendMessage(event)" class="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 border border-gray-200 focus-within:border-gray-400">
+                <input type="text" id="message-input" placeholder="Message..." autocomplete="off" class="flex-1 bg-transparent text-sm focus:outline-none text-gray-900">
+                <button type="submit" class="text-[#0095f6] font-semibold text-sm hover:opacity-80 transition-opacity">Envoyer</button>
+            </form>
+        </footer>
     </div>
 
-    <!-- Script Logique Firebase -->
+    <!-- Script Logique -->
     <script>
-        // TODO: Remplacez ces valeurs par la configuration de votre projet Firebase
-        // (Trouvable dans les Paramètres du projet > Général > Vos applications > SDK Firebase)
+        // Remplacez par vos identifiants Firebase
         const firebaseConfig = {
   apiKey: "AIzaSyAjZrcr430nF9eklDSpQEKSKZDvRYYNI_Y",
   authDomain: "connectmessenger-41ac8.firebaseapp.com",
@@ -59,7 +69,7 @@
   appId: "1:691375453229:web:9ada6b088fb2185eee34a4"
 };
 
-        // Initialisation de Firebase
+
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
@@ -68,13 +78,17 @@
         const chatScreen = document.getElementById('chat-screen');
         const messagesContainer = document.getElementById('messages-container');
         const messageInput = document.getElementById('message-input');
+        const currentUsername = document.getElementById('current-username');
+        const userAvatar = document.getElementById('user-avatar');
 
         let currentUser = null;
 
-        // Observer l'état de la connexion utilisateur
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
+                const emailPrefix = user.email.split('@')[0];
+                currentUsername.textContent = emailPrefix;
+                userAvatar.textContent = emailPrefix.charAt(0).toUpperCase();
                 showChat();
             } else {
                 currentUser = null;
@@ -83,15 +97,13 @@
             }
         });
 
-        // Gérer Connexion / Inscription
         async function handleAuth(type) {
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
             try {
                 if (type === 'signup') {
                     await auth.createUserWithEmailAndPassword(email, password);
-                    alert('Compte créé avec succès !');
                 } else {
                     await auth.signInWithEmailAndPassword(email, password);
                 }
@@ -104,14 +116,12 @@
             await auth.signOut();
         }
 
-        // Afficher l'écran de chat et écouter les messages en temps réel
         function showChat() {
             authScreen.classList.add('hidden');
             chatScreen.classList.remove('hidden');
             listenToMessages();
         }
 
-        // Écouter Firestore en temps réel (instantané)
         function listenToMessages() {
             db.collection('messages')
                 .orderBy('createdAt', 'asc')
@@ -120,17 +130,35 @@
                     snapshot.forEach(doc => {
                         const msg = doc.data();
                         const isMe = msg.userId === currentUser.uid;
+                        const senderName = msg.userEmail ? msg.userEmail.split('@')[0] : 'Inconnu';
+
+                        const wrapper = document.createElement('div');
+                        wrapper.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} w-full mb-1`;
+
+                        // Afficher le pseudo de l'expéditeur si ce n'est pas nous
+                        if (!isMe) {
+                            const nameTag = document.span || document.createElement('span');
+                            nameTag.className = 'text-[10px] text-gray-400 ml-3 mb-1';
+                            nameTag.textContent = senderName;
+                            wrapper.appendChild(nameTag);
+                        }
+
+                        const bubble = document.createElement('div');
+                        // Style bulle Instagram : Bleu (#3797EF) pour soi, Gris clair (#EFEFEF) pour les autres
+                        bubble.className = `max-w-[70%] px-4 py-2.5 rounded-2xl text-sm break-words ${
+                            isMe 
+                                ? 'bg-[#3797EF] text-white rounded-br-xs' 
+                                : 'bg-[#EFEFEF] text-black rounded-bl-xs'
+                        }`;
+                        bubble.textContent = msg.content;
                         
-                        const div = document.createElement('div');
-                        div.className = `max-w-[75%] p-3 rounded-2xl text-sm ${isMe ? 'bg-indigo-600 text-white self-end rounded-br-none' : 'bg-white text-gray-800 self-start border rounded-bl-none shadow-sm'}`;
-                        div.textContent = msg.content;
-                        messagesContainer.appendChild(div);
+                        wrapper.appendChild(bubble);
+                        messagesContainer.appendChild(wrapper);
                     });
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 });
         }
 
-        // Envoyer un message dans Firestore
         async function sendMessage(e) {
             e.preventDefault();
             const text = messageInput.value.trim();
@@ -140,6 +168,7 @@
                 await db.collection('messages').add({
                     content: text,
                     userId: currentUser.uid,
+                    userEmail: currentUser.email,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 messageInput.value = '';
